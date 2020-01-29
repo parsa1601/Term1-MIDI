@@ -1,0 +1,66 @@
+# include<stdio.h>
+# include<string.h>
+# include<stdlib.h>
+# include"beep.h"
+# include"notes_freq.h"
+
+float findfreq (char note_type[5]); 
+note_inf notes[110]; /******* protype of arrays of structures which is in our header library (notes_freq) *******/
+
+int main ()
+{
+NOTES_FREQ(notes); /******* the function which is in our header library (notes_freq) *******/
+
+char main_note [20]; /******* each string that we read from the file between two EOFs *******/
+char note_time[5]; /******* a string for saving numeral characters of duration *******/
+char note_type[5]; /******* a string for saving defining characters of frequency *******/
+int i,j;
+int duration; /******* an integer variable which saves numeral chracters as a integer *******/
+float frequency;
+/******* we read note from attached "NOTES.txt" file by using fopen & fgets fuctions.*******/
+FILE * input = fopen( "NOTES.txt" , "r");
+while ((fgets ( main_note , 20 , input )) != NULL)
+    {
+    /*******updating "i" & "j" at the beginning of each new note!*******/
+        i=0;
+        j=0;
+            while ( main_note[i++] != '\0')
+                {
+                /*******we should check whether our main_note is reached the frequency characters or not. based on the docs our key to recognize is "N" character*******/   
+                    if (main_note[i] == 'N')
+                        {
+                            i += 2; /******* skipping the 'space' which is afte N *******/  
+                                while (main_note[i] != 32)
+                                    {
+                                        note_type[j++] = main_note [i++]; /******** saving in row characters that defines frequency of note *******/
+                                    }
+                                    note_type[j]= '\0'; /******* finishing the saving process of frequency characters *******/
+                                
+                        }
+                    j=0;
+                    if (main_note[i] == 'd')
+                        {
+                /*******we should check whether our main_note is reached the duration characters or not. based on the docs our key to recognize is "d" character*******/   
+                            i+=2; /******* skipping the 'space' which is afte d *******/
+                                while (main_note[i] != 32)
+                                    {
+                                        note_time[j++] = main_note [i++]; /******** saving in row numeral characters that defines duration of note *******/
+                                    }
+                                    note_time[j] = '\0'; /******* finishing the saving process of duration characters *******/
+                        }
+                }
+        duration = atoi (note_time); /******* we should convert our numeral ascii character into an integer number ******/
+        frequency = findfreq(note_type);
+        beep (findfreq(note_type) , duration * 2);
+        printf("playing note type << %s >> with frequency about << %f Hz >> and duration about << %d ms >>\n", note_type, frequency, duration);
+    }
+}
+/******* the following function checks and returns the frequency of each character *******/
+float findfreq(char string[5])
+{
+    int i;
+    for (i=0;i<=108;i++)
+        {
+            if (strcmp(notes[i].name , string)== 0) return notes[i].freq;
+        }
+}
